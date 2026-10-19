@@ -176,7 +176,7 @@ async def test_ping_fails_fast_on_a_silent_peer() -> None:
     conn.reader, conn.writer, conn.connected = BufferedReader(reader), BufferedWriter(writer), True
 
     started = time.monotonic()
-    assert await conn.ping() is False
+    assert await asyncio.wait_for(conn.ping(), timeout=3) is False
     assert time.monotonic() - started < 3
     assert not conn.connected
 
