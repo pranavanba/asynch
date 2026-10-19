@@ -309,7 +309,10 @@ class Connection:
         except (asyncio.TimeoutError, TimeoutError) as e:
             logger.debug("Ping timed out for %s", self, exc_info=e)
             # The pool hands the connection back after a failed ping, so close it for the next query to reconnect
-            await self.disconnect()
+            if self.writer is not None and self.writer.writer is not None:
+                self.writer.writer.transport.abort()
+            self.reset_state()
+            self.connected = False
             return False
 
     async def _ping(self) -> bool:
